@@ -1,0 +1,40 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Aishwarya0625/devops4.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t aishwarya0625/devops4:latest .'
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
+                    bat 'docker login -u aishwarya0625 --password-stdin < nul'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat 'docker push aishwarya0625/devops4:latest'
+            }
+        }
+    }
+}
+stage('Login to Docker Hub') {
+    steps {
+        withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
+            bat 'echo %DOCKER_TOKEN% | docker login -u aishwarya0625 --password-stdin'
+        }
+    }
+}
